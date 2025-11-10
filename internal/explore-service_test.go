@@ -14,7 +14,9 @@ import (
 func setupMockDB(t *testing.T) (*sql.DB, sqlmock.Sqlmock, *ExploreService, func()) {
 	db, mock, err := sqlmock.New()
 	require.NoError(t, err, "failed to create sqlmock")
-	service := &ExploreService{DB: &DB{db}}
+	service := &ExploreService{
+		Business: NewExploreBusiness(&DB{db}),
+	}
 
 	cleanup := func() {
 		db.Close()
@@ -46,6 +48,9 @@ func TestListLikedYou(t *testing.T) {
 	_, mock, service, cleanup := setupMockDB(t)
 	defer cleanup()
 
+	pagination, err := parsePaginationParams(nil, nil)
+	require.NoError(t, err)
+
 	sqlRowsQueryResult := sqlmock.NewRows([]string{"id", "actor_user_id", "unix_timestamp"}).
 		AddRow(1, "uuid-user-A", 1700000000).
 		AddRow(2, "uuid-user-B", 1700001000)
@@ -53,8 +58,8 @@ func TestListLikedYou(t *testing.T) {
 	mock.ExpectQuery(`SELECT\s+id,\s+actor_user_id,\s+UNIX_TIMESTAMP\(created_at\)`).
 		WithArgs(
 			"uuid-recipient",
-			defaultPaginationToken,
-			defaultPageSize,
+			pagination.Token,
+			pagination.PageSize,
 		).
 		WillReturnRows(sqlRowsQueryResult)
 
@@ -76,6 +81,9 @@ func TestListNewLikedYou(t *testing.T) {
 	_, mock, service, cleanup := setupMockDB(t)
 	defer cleanup()
 
+	pagination, err := parsePaginationParams(nil, nil)
+	require.NoError(t, err)
+
 	rows := sqlmock.NewRows([]string{"id", "actor_user_id", "unix_timestamp"}).
 		AddRow(3, "uuid-user-X", 1700002000).
 		AddRow(4, "uuid-user-Y", 1700003000)
@@ -83,9 +91,9 @@ func TestListNewLikedYou(t *testing.T) {
 	mock.ExpectQuery(`SELECT\s+d\.id,\s+d\.actor_user_id,\s+UNIX_TIMESTAMP\(d\.created_at\)`).
 		WithArgs(
 			"uuid-recipient-2",
-			defaultPaginationToken,
+			pagination.Token,
 			"uuid-recipient-2",
-			defaultPageSize,
+			pagination.PageSize,
 		).
 		WillReturnRows(rows)
 

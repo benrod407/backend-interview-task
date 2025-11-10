@@ -1,0 +1,63 @@
+services:
+  mysql:
+    image: mysql:8.0
+    container_name: my_mysql_db
+    restart: unless-stopped
+
+    environment:  
+      # Environment variables to configure MySQL service, this should be handled differently in prod env
+      MYSQL_ROOT_PASSWORD: rootsecret
+      MYSQL_DATABASE: myapp_db
+      MYSQL_USER: myuser
+      MYSQL_PASSWORD: secret
+
+    ports:
+      - "3306:3306"
+
+    volumes:
+      - db_data:/var/lib/mysql
+      - ./db:/docker-entrypoint-initdb.d:ro  
+        # Mount local ./db folder (if it exists) as read-only inside container
+        # Any .sql or .sh files inside will run automatically on first container startup
+
+    healthcheck:  # Checks container health
+      test: ["CMD", "mysqladmin", "ping", "-h", "localhost"]
+      interval: 5s
+      timeout: 3s
+      retries: 10
+
+    networks:
+      - app-network
+
+  server:
+    build:
+      context: .
+      dockerfile: Dockerfile
+    container_name: explore_service_server
+    restart: unless-stopped
+
+    environment:
+      MYSQL_HOST: mysql # MySQL service name
+      MYSQL_PORT: 3306
+      MYSQL_DATABASE: myapp_db
+      MYSQL_USER: root
+      MYSQL_PASSWORD: rootsecret
+
+    ports:
+      - "9001:9001"
+
+    depends_on:
+      mysql:
+        condition: service_healthy
+        # Wait for MySQL to be healthy before starting the server
+        # prevents connection errors from the server starting too early
+
+    networks:
+      - app-network
+
+volumes:
+  db_data:
+
+networks:
+  app-network:
+    driver: bridge

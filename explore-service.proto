@@ -2,6 +2,8 @@ syntax = "proto3";
 
 package explore;
 
+option go_package = "github.com/benrod407/explore-service/explore_service_proto";
+
 service ExploreService {
   rpc ListLikedYou(ListLikedYouRequest) returns (ListLikedYouResponse); // List all users who liked the recipient
   rpc ListNewLikedYou(ListLikedYouRequest) returns (ListLikedYouResponse); // List all users who liked the recipient excluding those who have been liked in return

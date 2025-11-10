@@ -38,9 +38,15 @@ func main() {
 	log.Print("listening on port 9001")
 
 	grpcServer := grpc.NewServer()
+
+	// Create business logic layer
+	business := service.NewExploreBusiness(dbInstance)
+
+	// Create gRPC handler with business logic dependency
 	pb.RegisterExploreServiceServer(grpcServer, &service.ExploreService{
-		DB: dbInstance,
+		Business: business,
 	})
+
 	if err := grpcServer.Serve(lis); err != nil {
 		log.Fatalf("failed to serve: %v", err)
 	}

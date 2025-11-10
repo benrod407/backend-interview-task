@@ -1,6 +1,6 @@
 # Explore Service
 
-The Explore Service is a gRPC-based microservice designed to handle a subset the features needed to create a dating app. Currently, the service is focused on handling decisions (like/pass) between users in an efficient way, assuming that tables will grow overtime and queries must be optimized. The project is build using Golang, Docker and MySQL.
+The Explore Service is a gRPC-based microservice designed to handle a subset of the features needed to create a dating app. Currently, the service is focused on handling decisions (like/pass) between users in an efficient way, assuming tables will grow over time and queries must be optimized. The project is built using Golang, Docker and MySQL.
 
 ## Key Features
 
@@ -49,7 +49,7 @@ The Explore Service is a gRPC-based microservice designed to handle a subset the
 
 ## Assumptions
 - Decisions can be overwritten and we do not need logs of their previous state in the DB.
-- The decision table will grow considerably overtime, thus we must avoid full scans over the tables and we must implement pagination in an efficient way.
+- The decision table will grow considerably over time, thus we must avoid full scans over the tables and we must implement pagination in an efficient way.
 
 ## Optimizations
 - Create indexes to avoid full scans operations over DB tables
@@ -61,7 +61,7 @@ The Explore Service is a gRPC-based microservice designed to handle a subset the
 
 TLDR: To run the server and test it using a client script
 
-1. Open a terminal in the backend-interview-task folder, and run this commands one by one. Server will be set, listening to port 9001.
+1. Open a terminal in the backend-interview-task folder, and run these commands one by one. The server will be set, listening to port 9001.
     ```bash
     make deps
     make server
@@ -71,7 +71,7 @@ TLDR: To run the server and test it using a client script
     ```bash
     go run .\test-client\test-client.go
     ```
-3. This will trigger calls to the server, displaying logs of those request and responses. The calls include: checking the current like count of users, send new decisions to the server and displaying the users who like a specific user_id.
+3. This will trigger calls to the server, displaying logs of those requests and responses. The calls include: checking the current like count of users, sending new decisions to the server and displaying the users who like a specific user_id.
 
 
 More useful commands to manage the project DB and containers
@@ -118,8 +118,8 @@ More useful commands to manage the project DB and containers
 
 
 
-## Possible future work
-- Implement integration test for Client - Server - DB layers
+## Future work
+- Implement integration test for Client - Server - DB layers, using dockertest for example.
 - Fix env variables handling with external libraries
 - Evaluate cache usage for common queries
 - Add geo-location data to the users table, then create DB partitions based in regions, if business logic allows it

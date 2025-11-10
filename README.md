@@ -15,6 +15,31 @@ The Explore Service is a gRPC-based microservice designed to handle a subset the
 - Docker
 - protoc (protobuf compiler)
 
+## Layered Architecture
+
+```
+┌─────────────────────────────────────┐
+│   explore-service.go (Handlers)     │  ← gRPC protocol layer
+│   - Converts protobuf <> domain     │
+│   - Calls business logic            │
+│   - Handles gRPC errors             │
+└──────────────┬──────────────────────┘
+               │
+               ▼
+┌─────────────────────────────────────┐
+│   explore-business.go (Business)    │  ← Business logic layer
+│   - Business rules                  │
+│   - Orchestrates operations         │
+│   - Uses repository for data access │
+└──────────────┬──────────────────────┘
+               │
+               ▼
+┌─────────────────────────────────────┐
+│   DB (MySQL)                        │  ← Data access layer
+│   - Database queries                │
+│   - Transaction management          │
+└─────────────────────────────────────┘
+```
 
 ## gRPC Endpoints
 - ListLikedYou: List all users who liked the recipient.
